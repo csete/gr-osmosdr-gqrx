@@ -181,6 +181,14 @@ GR_INCLUDE_SUBDIRECTORY(uhd)
 endif(ENABLE_UHD)
 
 ########################################################################
+# Setup IIO component
+########################################################################
+GR_REGISTER_COMPONENT("IIO Devices" ENABLE_IIO GNURADIO_IIO_FOUND)
+if(ENABLE_IIO)
+GR_INCLUDE_SUBDIRECTORY(plutosdr)
+endif(ENABLE_IIO)
+
+########################################################################
 # Setup MiriSDR component
 ########################################################################
 GR_REGISTER_COMPONENT("Osmocom MiriSDR" ENABLE_MIRI LIBMIRISDR_FOUND)
