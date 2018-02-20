@@ -1,5 +1,6 @@
 /* -*- c++ -*- */
 /*
+ * Copyright 2018 Jeff Long <willcode4@gmail.com>
  * Copyright 2015 SDRplay Ltd <support@sdrplay.com>
  * Copyright 2012 Dimitri Stolnikov <horiz0n@gmx.net>
  *
@@ -22,17 +23,21 @@
 #define INCLUDED_SDRPLAY_SOURCE_C_H
 
 #include <gnuradio/sync_block.h>
-
 #include <gnuradio/thread/thread.h>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
 
 #include "osmosdr/ranges.h"
 
 #include "source_iface.h"
 
+#include <mirsdrapi-rsp.h>
+
 class sdrplay_source_c;
-typedef struct sdrplay_dev sdrplay_dev_t;
+
+template <typename T>
+struct Range {
+  T min;
+  T max;
+};
 
 /*
  * We use boost::shared_ptr's instead of raw pointers for all access
@@ -82,6 +87,9 @@ public:
             gr_vector_const_void_star &input_items,
             gr_vector_void_star &output_items );
 
+   bool start( void );
+   bool stop( void );
+
    static std::vector< std::string > get_devices();
 
    size_t get_num_channels( void );
@@ -112,25 +120,58 @@ public:
 
    void set_dc_offset_mode( int mode, size_t chan = 0 );
    void set_dc_offset( const std::complex<double> &offset, size_t chan = 0 );
+   void set_iq_balance_mode( int mode, size_t chan = 0 );
 
    double set_bandwidth( double bandwidth, size_t chan = 0 );
    double get_bandwidth( size_t chan = 0 );
    osmosdr::freq_range_t get_bandwidth_range( size_t chan = 0 );
 
 private:
-   void reinit_device(void);
-   void set_gain_limits(double freq);
+  void startStreaming(void);
+  void stopStreaming(void);
+  void reallocateBuffers(int size, int num);
+  void reinitDevice(int reason);
+  int checkLNA(int lna);
+  void streamCallback(short *xi, short *xq, unsigned int firstSampleNum,
+                      int grChanged, int rfChanged, int fsChanged,
+                      unsigned int numSamples, unsigned int reset);
+  void gainChangeCallback(unsigned int gRdB, unsigned int lnaGRdB);
 
-   sdrplay_dev_t *_dev;
+  static void streamCallbackWrap(short *xi, short *xq, unsigned int firstSampleNum,
+                                 int grChanged, int rfChanged, int fsChanged,
+                                 unsigned int numSamples, unsigned int reset,
+                                 void *cbContext);
+  static void gainChangeCallbackWrap(unsigned int gRdB, unsigned int lnaGRdB, void *cbContext);
 
-   std::vector< short > _bufi;
-   std::vector< short > _bufq;
-   int _buf_offset;
-   boost::mutex _buf_mutex;
-
-   bool _running;
-   bool _uninit;
    bool _auto_gain;
+   int _gain;
+   int _gRdB;
+   int _lna;
+   int _bcastNotch;
+   int _dabNotch;
+   double _fsHz;
+   int _decim;
+   double _rfHz;
+   mir_sdr_Bw_MHzT _bwType;
+   mir_sdr_If_kHzT _ifType;
+   mir_sdr_LoModeT _loMode;
+   int _samplesPerPacket;
+   bool _dcMode;
+   bool _iqMode;
+   unsigned char _hwVer;
+   unsigned int _devIndex;
+   std::string _antenna;
+   int _biasT;
+
+   gr_complex *_buffer;
+   int _bufferOffset;
+   int _bufferSpaceRemaining;
+   boost::mutex _bufferMutex;
+   boost::condition_variable _bufferReady;  // buffer is ready to move to other thread
+
+   bool _streaming;
+   bool _flowgraphRunning;
+   bool _reinit;  // signal streamer to return after a reinit
 };
 
 #endif /* INCLUDED_SDRPLAY_SOURCE_C_H */

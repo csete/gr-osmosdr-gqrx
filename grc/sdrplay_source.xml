@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<block>
+  <name>SDRplay Source</name>
+  <key>sdrplay_source</key>
+  <category>Sources</category>
+  <import>import osmosdr</import>
+  <make>osmosdr.source(args = $args + ",bias=" + str($bias) + ",lo=" + str($loFreq))
+self.$(id).set_sample_rate($sample_rate)
+self.$(id).set_center_freq($freq, 0)
+self.$(id).set_freq_corr($corr, 0)
+self.$(id).set_dc_offset_mode($dc_offset_mode, 0)
+self.$(id).set_iq_balance_mode($iq_balance_mode, 0)
+self.$(id).set_gain_mode($gain_mode, 0)
+self.$(id).set_gain($lna, "LNA_ATTEN_STEP", 0)
+self.$(id).set_gain($grdb, "IF_ATTEN_DB", 0)
+self.$(id).set_antenna($ant, 0)
+self.$(id).set_bandwidth($bw, 0)
+  </make>
+  <callback>set_sample_rate($sample_rate)</callback>
+  <callback>set_center_freq($freq, 0)</callback>
+  <callback>set_freq_corr($corr, 0)</callback>
+  <callback>set_dc_offset_mode($dc_offset_mode, 0)</callback>
+  <callback>set_iq_balance_mode($iq_balance_mode, 0)</callback>
+  <callback>set_gain_mode($gain_mode, 0)</callback>
+  <callback>set_gain($lna, "LNA_ATTEN_STEP", 0)</callback>
+  <callback>set_gain($grdb, "IF_ATTEN_DB", 0)</callback>
+  <callback>set_antenna($ant, 0)</callback>
+  <callback>set_bandwidth($bw, 0)</callback>
+  <param>
+    <name>Output Type</name>
+    <key>type</key>
+    <type>enum</type>
+    <option>
+      <name>Complex float32</name>
+      <key>fc32</key>
+      <opt>type:fc32</opt>
+    </option>
+  </param>
+  <param>
+    <name>Device Arguments</name>
+    <key>args</key>
+    <value></value>
+    <type>string</type>
+  </param>
+  <param>
+    <name>Num Channels</name>
+    <key>nchan</key>
+    <value>1</value>
+    <type>int</type>
+    <option>
+      <name>1</name>
+      <key>1</key>
+    </option>
+  </param>
+  <param>
+    <name>Sample Rate (sps)</name>
+    <key>sample_rate</key>
+    <value>samp_rate</value>
+    <type>real</type>
+  </param>
+
+  <param>
+    <name>Frequency (Hz)</name>
+    <key>freq</key>
+    <value>100e6</value>
+    <type>real</type>
+  </param>
+  <param>
+  <name>Freq. Corr. (ppm)</name>
+    <key>corr</key>
+    <value>0</value>
+    <type>real</type>
+  </param>
+  <param>
+    <name>DC Offset Mode</name>
+    <key>dc_offset_mode</key>
+    <value>0</value>
+    <type>int</type>
+    <option><name>Off</name><key>0</key></option>
+    <option><name>Automatic</name><key>2</key></option>
+  </param>
+  <param>
+    <name>IQ Balance Mode</name>
+    <key>iq_balance_mode</key>
+    <value>0</value>
+    <type>int</type>
+    <option><name>Off</name><key>0</key></option>
+    <option><name>Automatic</name><key>2</key></option>
+  </param>
+  <param>
+    <name>Gain Mode</name>
+    <key>gain_mode</key>
+    <value>False</value>
+    <type>bool</type>
+    <option><name>Manual</name><key>False</key></option>
+    <option><name>Automatic</name><key>True</key></option>
+  </param>
+  <param>
+    <name>LNA Atten Step</name>
+    <key>lna</key>
+    <value>0</value>
+    <type>real</type>
+  </param>
+  <param>
+    <name>IF Atten (dB)</name>
+    <key>grdb</key>
+    <value>40</value>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Antenna</name>
+    <key>ant</key>
+    <value></value>
+    <type>string</type>
+    <option><name>Default</name><key></key></option>
+    <option><name>RX</name><key>RX</key></option>
+    <option><name>A</name><key>A</key></option>
+    <option><name>B</name><key>B</key></option>
+    <option><name>High Z</name><key>HIGHZ</key></option>
+  </param>
+  <param>
+    <name>Bandwidth (Hz)</name>
+    <key>bw</key>
+    <value>1536e3</value>
+    <type>real</type>
+  </param>
+  <param>
+    <name>Bias Voltage</name>
+    <key>bias</key>
+    <value>0</value>
+    <type>int</type>
+    <option><name>Off</name><key>0</key></option>
+    <option><name>On</name><key>1</key></option>
+  </param>
+  <param>
+    <name>AM LO Freq</name>
+    <key>loFreq</key>
+    <value>0</value>
+    <type>int</type>
+    <option><name>Auto</name><key>0</key></option>
+    <option><name>120 MHz</name><key>120</key></option>
+    <option><name>144 MHz</name><key>144</key></option>
+    <option><name>168 MHz</name><key>168</key></option>
+  </param>
+  <source>
+    <name>out</name>
+    <type>$type.type</type>
+    <nports>1</nports>
+  </source>
+</block>
