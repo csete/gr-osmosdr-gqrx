@@ -378,7 +378,7 @@ void sdrplay_source_c::reinitDevice(int reason)
                  );
 
   // Set decimation with halfband filter
-  if (reason && (int)mir_sdr_CHANGE_FS_FREQ)
+  if (reason & (int)mir_sdr_CHANGE_FS_FREQ)
     mir_sdr_DecimateControl(_decim != 1, _decim, 1);
 
   _bufferReady.notify_one();
