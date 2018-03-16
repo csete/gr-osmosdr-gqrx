@@ -160,6 +160,8 @@ private: /* members */
   size_t _nchan;
   double _sample_rate;
   double _bandwidth;
+  double _center_freq;
+  double _freq_corr_ppm;
 
   gr::thread::thread _thread;
   bool _run_usb_read_task;

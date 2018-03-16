@@ -118,6 +118,7 @@ rfspace_source_c::rfspace_source_c (const std::string &args)
     _nchan(1),
     _sample_rate(NAN),
     _bandwidth(0.0f),
+    _freq_corr_ppm(0.0),
     _fifo(NULL)
 {
   std::string host = "";
@@ -486,6 +487,8 @@ rfspace_source_c::rfspace_source_c (const std::string &args)
     _run_tcp_keepalive_task = true;
     _thread = gr::thread::thread( boost::bind(&rfspace_source_c::tcp_keepalive_task, this) );
   }
+
+  _center_freq = get_center_freq();
 
 #if 0
   std::cerr << "sample_rates: " << get_sample_rates().to_pp_string() << std::endl;
@@ -1524,7 +1527,10 @@ osmosdr::freq_range_t rfspace_source_c::get_freq_range( size_t chan )
 
 double rfspace_source_c::set_center_freq( double freq, size_t chan )
 {
-  uint32_t u32_freq = freq;
+  uint32_t u32_freq;
+
+  u32_freq = freq * (1.0 + _freq_corr_ppm * 0.000001);
+  _center_freq = freq;
 
   /* SDR-IQ 5.2.2 Receiver Frequency */
   /* SDR-IP 4.2.2 Receiver Frequency */
@@ -1541,7 +1547,7 @@ double rfspace_source_c::set_center_freq( double freq, size_t chan )
 
   transaction( tune, sizeof(tune) );
 
-  return get_center_freq( chan );
+  return _center_freq;
 }
 
 double rfspace_source_c::get_center_freq( size_t chan )
@@ -1569,12 +1575,15 @@ double rfspace_source_c::get_center_freq( size_t chan )
 
 double rfspace_source_c::set_freq_corr( double ppm, size_t chan )
 {
+  _freq_corr_ppm = ppm;
+  set_center_freq( _center_freq, chan );
+
   return get_freq_corr( chan );
 }
 
 double rfspace_source_c::get_freq_corr( size_t chan )
 {
-  return 0;
+  return _freq_corr_ppm;
 }
 
 std::vector<std::string> rfspace_source_c::get_gain_names( size_t chan )
