@@ -219,6 +219,7 @@ While primarily being developed for the OsmoSDR hardware, this block as well sup
  * gnuradio .cfile input through libgnuradio-blocks
  * RFSPACE SDR-IQ, SDR-IP, NetSDR (incl. X2 option)
  * AirSpy Wideband Receiver through libairspy
+ * SpyServer Devices through spyserver
 #end if
 #if $sourk == 'sink':
  * gnuradio .cfile output through libgnuradio-blocks
@@ -260,6 +261,7 @@ Lines ending with ... mean it's possible to bind devices together by specifying 
   cloudiq=127.0.0.1[:50000]
   sdr-iq=/dev/ttyUSB0
   airspy=0[,bias=0|1][,linearity][,sensitivity]
+  spyserver=0,ip=192.168.0.10[,port=5555]
 #end if
 #if $sourk == 'sink':
   file='/path/to/your file',rate=1e6[,freq=100e6][,append=true][,throttle=true] ...

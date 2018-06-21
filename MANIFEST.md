@@ -4,6 +4,7 @@ tags:
     - rtlsdr
     - bladerf
     - airspy
+    - spyserver
     - rfspace
     - hackrf
     - soapy

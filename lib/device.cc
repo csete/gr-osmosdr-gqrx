@@ -90,6 +90,10 @@
 #include <freesrp_source_c.h>
 #endif
 
+#ifdef ENABLE_SPYSERVER
+#include <spyserver_source_c.h>
+#endif
+
 #include "arg_helpers.h"
 
 using namespace osmosdr;
@@ -201,6 +205,10 @@ devices_t device::find(const device_t &hint)
 
 #ifdef ENABLE_RTL_TCP
   BOOST_FOREACH( std::string dev, rtl_tcp_source_c::get_devices( fake ) )
+    devices.push_back( device_t(dev) );
+#endif
+#ifdef ENABLE_SPYSERVER
+  BOOST_FOREACH( std::string dev, spyserver_source_c::get_devices( fake ) )
     devices.push_back( device_t(dev) );
 #endif
 #ifdef ENABLE_REDPITAYA
