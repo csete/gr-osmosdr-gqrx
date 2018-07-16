@@ -607,7 +607,9 @@ double spyserver_source_c::set_center_freq(double centerFrequency, size_t chan) 
     return centerFrequency;
   }
 
-  throw std::runtime_error(boost::str( boost::format("Unsupported center frequency: %gM") % (centerFrequency/1e6) ) );
+  std::cerr << boost::format("Unsupported center frequency: %gM") % (centerFrequency/1e6) << std::endl;
+
+  return this->get_center_freq(chan);
 }
 
 void spyserver_source_c::process_uint8_fft() {
